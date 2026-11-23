@@ -63,7 +63,7 @@ function Login({ setPath }) {
           <button className="login-submit" type="submit">Log In</button>
           {error && <p className="login-error" role="alert">{error}</p>}
         </form>
-        <p className="login-hint">Demo mode: username or email selects the account. Password verification is not connected.</p>
+        <p className="login-hint">Demo email:@admin Password: anything</p>
       </section>
     </main>
   )

@@ -15,7 +15,8 @@ function Dashboard({ setPath }) {
 
   return (
     <AdminLayout setPath={setPath} active="dashboard" title="Department Overview">
-      <div className="dashboard-context"><span>Real-time equipment status and lifecycle analytics</span><select defaultValue="2026"><option value="2026">Year 2026-2027</option><option>Year 2025-2026</option></select></div>
+      <div className="dashboard-page">
+      <div className="dashboard-context"><span>Real-time equipment status and lifecycle analytics</span><select defaultValue="2026" aria-label="Academic year"><option value="2026">1st Sem AY 2026-2027</option><option>1st Sem AY 2025-2026</option></select></div>
       <div className="stat-grid dashboard-kpis">
         <article><div><span>Total Assets</span><strong>1,240</strong><small className="trend-positive">↑ 12 this month</small></div></article>
         <article><div><span>Currently in Use</span><strong>184</strong><small>14.8% active</small></div></article>
@@ -41,10 +42,24 @@ function Dashboard({ setPath }) {
             <button className="action-notice" onClick={() => navigate('/admin/notifications')}><span>▤</span><div><strong>Warranty Expiring: 5 Laptops</strong><small>Laptops warranty expires in 14 days</small></div><b>›</b></button>
             <div className="alert-strip">⚠ 2 items exceed 50% purchase cost threshold</div>
           </section>
-          <section className="admin-panel"><div className="panel-heading"><div><h2>Asset Overview</h2><p>Live inventory snapshot</p></div></div><div className="overview-list"><div><span>Available</span><strong>{available} records</strong></div><div><span>In maintenance</span><strong>{inRepair} record</strong></div><div><span>Out of service</span><strong>0 records</strong></div></div><p className="form-note">{initialEquipment.length} sample records · {available} available · {inRepair} maintenance · 0 out of service</p></section>
-          <section className="admin-panel"><div className="panel-heading"><div><h2>Financial Flag Queue</h2></div></div><p className="form-note">2 assets above 50% repair cost threshold. Review status not recorded.</p><button className="table-action" onClick={() => navigate('/admin/reports')}>View Financial Analysis →</button></section>
-          <section className="admin-panel"><div className="panel-heading"><div><h2>Calendar</h2></div><button onClick={() => navigate('/admin/schedule')}>View Calendar</button></div><p className="form-note">{initialSchedules.length} scheduled events · October 2026</p></section>
+          <section className="admin-panel system-health-panel">
+            <div className="panel-heading"><div><h2>System Health</h2></div></div>
+            <div className="system-health-list">
+              <div><span className="health-dot"></span><div><strong>Inventory records</strong><small>Last synced today</small></div></div>
+              <div><span className="health-dot"></span><div><strong>{available} assets available</strong><small>{inRepair} currently in maintenance</small></div></div>
+            </div>
+          </section>
+          <section className="admin-panel calendar-summary-panel">
+            <div className="panel-heading"><div><h2>Upcoming Schedules</h2></div><button onClick={() => navigate('/admin/schedule')}>View Calendar</button></div>
+            {initialSchedules.slice(0, 2).map((schedule) => (
+              <button className="schedule-summary" key={schedule.id} onClick={() => navigate('/admin/schedule')}>
+                <time>{schedule.date.slice(-2)}</time>
+                <div><strong>{schedule.title}</strong><small>{schedule.start} - {schedule.end}</small></div>
+              </button>
+            ))}
+          </section>
         </aside>
+      </div>
       </div>
     </AdminLayout>
   )

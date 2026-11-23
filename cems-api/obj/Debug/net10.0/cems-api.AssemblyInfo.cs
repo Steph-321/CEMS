@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("cems-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+82d1117e7d5d01076a83ddbd5ea4c69789839d72")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aa0366da143cd988f7fd86ecc4046cc5e1f7cbb8")]
 [assembly: System.Reflection.AssemblyProductAttribute("cems-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("cems-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
