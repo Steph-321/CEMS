@@ -41,7 +41,7 @@ function AddUser({ setPath }) {
       <section className="admin-panel">
         <div className="page-toolbar"><div><h2>Add New User</h2><p>User Management / Create account</p></div><button className="secondary-action" onClick={() => navigate('/admin/users')}>← Back</button></div>
         {saved && <p className="save-message">User created. Returning to User Management...</p>}
-        <form className="admin-form" onSubmit={submit}>
+        <form className="admin-form add-user-form" onSubmit={submit}>
           <div className="admin-form-grid">
             <div className="subpanel">
               <h3>Staff Information</h3>

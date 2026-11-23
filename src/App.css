@@ -1320,7 +1320,22 @@
 .admin-shell .admin-form textarea { min-height: 88px; resize: vertical; }
 .admin-shell .admin-form input:focus,
 .admin-shell .admin-form select:focus,
-.admin-shell .admin-form textarea:focus { border-color: #d92931; outline: 2px solid rgba(217,41,49,.12); }
+.admin-shell .admin-form textarea:focus { border-color: #8ba0b8; outline: 2px solid rgba(139,160,184,.16); }
+.admin-shell .admin-form.add-user-form input,
+.admin-shell .admin-form.add-user-form select {
+  height: 43px;
+  border: 1px solid #dfe5ec;
+  border-radius: 6px;
+  padding: 0 12px;
+  color: #202e45;
+  font-size: 13px;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.admin-shell .admin-form.add-user-form input:focus,
+.admin-shell .admin-form.add-user-form select:focus {
+  border-color: #e7aa32;
+  outline: 3px solid rgba(231, 170, 50, 0.18);
+}
 .admin-shell .form-span-2 { grid-column: 1 / -1; }
 .admin-shell .subpanel { display: grid; align-content: start; gap: 10px; border: 1px solid #e8edf2; border-radius: 7px; background: #fbfcfd; padding: 14px; }
 .admin-shell .subpanel h3 { margin: 0 0 2px; color: #34445a; font-size: 12px; }
