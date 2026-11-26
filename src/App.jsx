@@ -14,7 +14,7 @@ import Notifications from './pages/admin/notifications.jsx'
 import ManageUsers from './pages/admin/manageUsers.jsx'
 import AddUser from './pages/admin/addUser.jsx'
 import Settings from './pages/admin/settings.jsx'
-import StaffWelcome from './pages/staff/welcomePage.jsx'
+import StaffDashboard from './pages/staff/StaffDashboard.jsx'
 import './App.css'
 
 function App() {
@@ -40,7 +40,7 @@ function App() {
   if (path === '/admin/users/add') return <AddUser setPath={setPath} />
   if (path === '/admin/users') return <ManageUsers setPath={setPath} />
   if (path === '/admin/settings') return <Settings setPath={setPath} />
-  if (path.startsWith('/staff')) return <StaffWelcome setPath={setPath} />
+  if (path === '/staff' || path === '/staff/dashboard') return <StaffDashboard setPath={setPath} />
   return <Login setPath={setPath} />
 }
 

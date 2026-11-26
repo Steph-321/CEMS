@@ -43,7 +43,7 @@ function Login({ setPath }) {
       return
     }
 
-    navigate(account.role === 'Staff' ? '/staff' : '/admin')
+    navigate(account.role === 'Staff' ? '/staff/dashboard' : '/admin/dashboard')
   }
 
   return (
