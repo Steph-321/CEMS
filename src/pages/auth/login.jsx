@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import seal from '../../assets/campus-seal.png'
-import { findLocalDemoAccount, saveCurrentUser } from './localAuth.js'
+import { findLocalDemoAccount, saveCurrentUser, verifyLocalPassword } from './localAuth.js'
 
 function Login({ setPath }) {
   const [error, setError] = useState('')
@@ -10,7 +10,7 @@ function Login({ setPath }) {
     setPath(path)
   }
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
     let account
@@ -26,6 +26,18 @@ function Login({ setPath }) {
       setError('No account matches that username or email.')
       return
     }
+    try {
+      const passwordIsValid = await verifyLocalPassword(account, String(form.get('password')))
+      if (!passwordIsValid) {
+        setError('Incorrect password.')
+        return
+      }
+    } catch (passwordError) {
+      console.error('Unable to verify the account password.', passwordError)
+      setError('Could not verify the password. Please try again.')
+      return
+    }
+
     if (account.status !== 'Active') {
       setError('This account is deactivated. Contact an administrator.')
       return

@@ -2,6 +2,7 @@ import { initialUsers } from '../admin/adminData.jsx'
 
 const usersStorageKey = 'cems-admin-users'
 const currentUserStorageKey = 'cems-current-user'
+const passwordHashIterations = 210000
 
 const defaultAdmin = {
   id: 'demo-admin',
@@ -10,6 +11,71 @@ const defaultAdmin = {
   email: 'admin@cems.edu',
   role: 'Administrator',
   status: 'Active',
+}
+
+function bytesToHex(bytes) {
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
+function hexToBytes(value) {
+  if (!/^(?:[0-9a-f]{2})+$/i.test(value)) {
+    throw new Error('Saved password credentials are invalid.')
+  }
+  return new Uint8Array(value.match(/.{2}/g).map((byte) => Number.parseInt(byte, 16)))
+}
+
+async function derivePasswordHash(password, salt) {
+  const cryptoApi = globalThis.crypto
+  if (!cryptoApi || !cryptoApi.subtle) {
+    throw new Error('Secure password verification is not available in this browser.')
+  }
+
+  const key = await cryptoApi.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits'],
+  )
+  const hash = await cryptoApi.subtle.deriveBits({
+    name: 'PBKDF2',
+    salt,
+    iterations: passwordHashIterations,
+    hash: 'SHA-256',
+  }, key, 256)
+  return bytesToHex(new Uint8Array(hash))
+}
+
+export async function createLocalPasswordCredential(password) {
+  const cryptoApi = globalThis.crypto
+  if (!cryptoApi || !cryptoApi.subtle || typeof cryptoApi.getRandomValues !== 'function') {
+    throw new Error('Secure password storage is not available in this browser.')
+  }
+
+  const salt = new Uint8Array(16)
+  cryptoApi.getRandomValues(salt)
+  return {
+    passwordSalt: bytesToHex(salt),
+    passwordHash: await derivePasswordHash(password, salt),
+  }
+}
+
+export async function verifyLocalPassword(account, password) {
+  if (account.passwordHash === undefined && account.passwordSalt === undefined) return true
+  if (typeof account.passwordHash !== 'string' || typeof account.passwordSalt !== 'string') {
+    throw new Error('Saved password credentials are incomplete.')
+  }
+
+  const expectedHash = hexToBytes(account.passwordHash)
+  const salt = hexToBytes(account.passwordSalt)
+  const actualHash = hexToBytes(await derivePasswordHash(password, salt))
+  if (expectedHash.length !== actualHash.length) return false
+
+  let difference = 0
+  for (let index = 0; index < expectedHash.length; index += 1) {
+    difference |= expectedHash[index] ^ actualHash[index]
+  }
+  return difference === 0
 }
 
 function normalizeUsername(value) {
@@ -31,6 +97,8 @@ export function findLocalDemoAccount(identifier) {
     !account
     || typeof account !== 'object'
     || requiredFields.some((field) => typeof account[field] !== 'string')
+    || (account.passwordHash !== undefined && typeof account.passwordHash !== 'string')
+    || (account.passwordSalt !== undefined && typeof account.passwordSalt !== 'string')
   ))) {
     throw new Error('One or more saved user accounts are incomplete.')
   }
