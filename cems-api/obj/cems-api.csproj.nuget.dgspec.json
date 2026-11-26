@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ADMIN\\Desktop\\CEMS - Copy\\cems-api\\cems-api.csproj": {}
+    "C:\\Users\\admin\\Documents\\GitHub\\CEMS\\cems-api\\cems-api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ADMIN\\Desktop\\CEMS - Copy\\cems-api\\cems-api.csproj": {
+    "C:\\Users\\admin\\Documents\\GitHub\\CEMS\\cems-api\\cems-api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\CEMS - Copy\\cems-api\\cems-api.csproj",
+        "projectUniqueName": "C:\\Users\\admin\\Documents\\GitHub\\CEMS\\cems-api\\cems-api.csproj",
         "projectName": "cems-api",
-        "projectPath": "C:\\Users\\ADMIN\\Desktop\\CEMS - Copy\\cems-api\\cems-api.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ADMIN\\Desktop\\CEMS - Copy\\cems-api\\obj\\",
+        "projectPath": "C:\\Users\\admin\\Documents\\GitHub\\CEMS\\cems-api\\cems-api.csproj",
+        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\admin\\Documents\\GitHub\\CEMS\\cems-api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -88,7 +88,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.403/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.404/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
