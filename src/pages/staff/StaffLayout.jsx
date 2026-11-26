@@ -35,11 +35,11 @@ function StaffLayout({ setPath, activePath, children }) {
         <main className="staff-notifications">{children}</main>
 
         <nav className="staff-bottom-nav" aria-label="Staff navigation">
-          <button type="button" className={activePath === 'dashboard' ? 'active' : ''} aria-current={activePath === 'dashboard' ? 'page' : undefined} onClick={() => navigate('/staff/dashboard')}><span><StaffIcon name="home" /></span><small>Home</small></button>
-          <button type="button" className={activePath === 'inventory' ? 'active' : ''} aria-current={activePath === 'inventory' ? 'page' : undefined} onClick={() => navigate('/staff/inventory')}><span><StaffIcon name="inventory" /></span><small>Inventory</small></button>
-          <button type="button" className={`staff-nav-add ${activePath === 'scan' ? 'active' : ''}`} aria-label="Scan equipment" aria-current={activePath === 'scan' ? 'page' : undefined} onClick={() => navigate('/staff/scan')}><span><StaffIcon name="scan" /></span></button>
-          <button type="button" className={activePath === 'calendar' ? 'active' : ''} aria-current={activePath === 'calendar' ? 'page' : undefined} onClick={() => navigate('/staff/calendar')}><span><StaffIcon name="calendar" /></span><small>Calendar</small></button>
-          <button type="button" className={activePath === 'profile' ? 'active' : ''} aria-current={activePath === 'profile' ? 'page' : undefined} onClick={() => navigate('/staff/profile')}><span><StaffIcon name="profile" /></span><small>Profile</small></button>
+          <button type="button" className={activePath === 'dashboard' ? 'active' : ''} aria-label="Home" title="Home" aria-current={activePath === 'dashboard' ? 'page' : undefined} onClick={() => navigate('/staff/dashboard')}><span><StaffIcon name="home" /></span><small>Home</small></button>
+          <button type="button" className={activePath === 'inventory' ? 'active' : ''} aria-label="Inventory" title="Inventory" aria-current={activePath === 'inventory' ? 'page' : undefined} onClick={() => navigate('/staff/inventory')}><span><StaffIcon name="inventory" /></span><small>Inventory</small></button>
+          <button type="button" className={`staff-nav-add ${activePath === 'scan' ? 'active' : ''}`} aria-label="Scan equipment" title="Scan equipment" aria-current={activePath === 'scan' ? 'page' : undefined} onClick={() => navigate('/staff/scan')}><span><StaffIcon name="scan" /></span><small>Scan</small></button>
+          <button type="button" className={activePath === 'calendar' ? 'active' : ''} aria-label="Calendar" title="Calendar" aria-current={activePath === 'calendar' ? 'page' : undefined} onClick={() => navigate('/staff/calendar')}><span><StaffIcon name="calendar" /></span><small>Calendar</small></button>
+          <button type="button" className={activePath === 'profile' ? 'active' : ''} aria-label="Profile" title="Profile" aria-current={activePath === 'profile' ? 'page' : undefined} onClick={() => navigate('/staff/profile')}><span><StaffIcon name="profile" /></span><small>Profile</small></button>
         </nav>
       </div>
     </div>
