@@ -21,29 +21,26 @@ function StaffLayout({ setPath, activePath, children }) {
   return (
     <div className="staff-dashboard-stage">
       <div className="staff-dashboard">
-        <div className="phone-status" aria-hidden="true">
-          <time>9:30</time>
-          <div className="phone-status-icons"><span className="signal-bars">▮▮▮</span><span className="status-bell">●</span></div>
-        </div>
-
         <header className="staff-dashboard-header">
           <div className="staff-brand">
             <img src={seal} alt="" />
             <span>Campus Equipment<strong>Management System</strong></span>
           </div>
-          <button className="staff-notification-button" aria-label="Notifications" onClick={() => navigate('/staff/dashboard')}><StaffIcon name="bell" /></button>
+          <div className="staff-header-actions">
+            <span className="staff-portal-label">STAFF PORTAL</span>
+            <button type="button" className={`staff-notification-button ${activePath === 'notifications' ? 'active' : ''}`} aria-label="Notifications" aria-current={activePath === 'notifications' ? 'page' : undefined} onClick={() => navigate('/staff/notifications')}><StaffIcon name="bell" /></button>
+          </div>
         </header>
 
         <main className="staff-notifications">{children}</main>
 
         <nav className="staff-bottom-nav" aria-label="Staff navigation">
-          <button type="button" className={activePath === 'dashboard' ? 'active' : ''} onClick={() => navigate('/staff/dashboard')}><span><StaffIcon name="home" /></span><small>Dashboard</small></button>
-          <button type="button" className={activePath === 'inventory' ? 'active' : ''} onClick={() => navigate('/staff/inventory')}><span><StaffIcon name="inventory" /></span><small>Inventory</small></button>
-          <button type="button" className={`staff-nav-add ${activePath === 'scan' ? 'active' : ''}`} aria-label="Scan equipment" onClick={() => navigate('/staff/scan')}><span><StaffIcon name="scan" /></span></button>
-          <button type="button" className={activePath === 'calendar' ? 'active' : ''} onClick={() => navigate('/staff/calendar')}><span><StaffIcon name="calendar" /></span><small>Calendar</small></button>
-          <button type="button" className={activePath === 'profile' ? 'active' : ''} onClick={() => navigate('/staff/profile')}><span><StaffIcon name="profile" /></span><small>Profile</small></button>
+          <button type="button" className={activePath === 'dashboard' ? 'active' : ''} aria-current={activePath === 'dashboard' ? 'page' : undefined} onClick={() => navigate('/staff/dashboard')}><span><StaffIcon name="home" /></span><small>Home</small></button>
+          <button type="button" className={activePath === 'inventory' ? 'active' : ''} aria-current={activePath === 'inventory' ? 'page' : undefined} onClick={() => navigate('/staff/inventory')}><span><StaffIcon name="inventory" /></span><small>Inventory</small></button>
+          <button type="button" className={`staff-nav-add ${activePath === 'scan' ? 'active' : ''}`} aria-label="Scan equipment" aria-current={activePath === 'scan' ? 'page' : undefined} onClick={() => navigate('/staff/scan')}><span><StaffIcon name="scan" /></span></button>
+          <button type="button" className={activePath === 'calendar' ? 'active' : ''} aria-current={activePath === 'calendar' ? 'page' : undefined} onClick={() => navigate('/staff/calendar')}><span><StaffIcon name="calendar" /></span><small>Calendar</small></button>
+          <button type="button" className={activePath === 'profile' ? 'active' : ''} aria-current={activePath === 'profile' ? 'page' : undefined} onClick={() => navigate('/staff/profile')}><span><StaffIcon name="profile" /></span><small>Profile</small></button>
         </nav>
-
       </div>
     </div>
   )

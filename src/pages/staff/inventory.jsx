@@ -6,15 +6,19 @@ function Inventory({ setPath }) {
 
   return (
     <StaffLayout setPath={setPath} activePath="inventory">
-      <div className="staff-view-heading"><h1>Inventory</h1><span>0 items</span></div>
+      <div className="staff-view-heading">
+        <div><span className="staff-eyebrow">CAMPUS ASSETS</span><h1>Inventory</h1><p>Search and explore registered equipment.</p></div>
+        <span className="staff-item-count">0 items</span>
+      </div>
       <label className="staff-search">
-        <span aria-hidden="true">⌕</span>
-        <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search equipment" />
+        <span className="staff-search-icon" aria-hidden="true">⌕</span>
+        <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by name or asset tag" />
       </label>
-      <section className="staff-empty-card">
+      <section className="staff-empty-card staff-inventory-empty">
         <span className="staff-empty-icon"><StaffIcon name="inventory" /></span>
-        <strong>{search ? 'No matching equipment' : 'No equipment recorded'}</strong>
-        <p>{search ? 'Try another search term.' : 'Registered equipment will appear here.'}</p>
+        <span className="staff-eyebrow">INVENTORY</span>
+        <strong>{search ? 'No matching equipment' : 'Your inventory is clear'}</strong>
+        <p>{search ? 'Try a different name or asset tag.' : 'Registered equipment will appear here when it is added.'}</p>
       </section>
     </StaffLayout>
   )

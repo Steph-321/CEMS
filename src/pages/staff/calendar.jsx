@@ -22,7 +22,7 @@ function Calendar({ setPath }) {
 
   return (
     <StaffLayout setPath={setPath} activePath="calendar">
-      <div className="staff-view-heading"><h1>Calendar</h1><span>Schedule</span></div>
+      <div className="staff-view-heading"><div><span className="staff-eyebrow">PLAN AHEAD</span><h1>Calendar</h1><p>Keep an eye on equipment events.</p></div></div>
       <section className="staff-calendar-card">
         <div className="staff-calendar-head">
           <button type="button" aria-label="Previous month" onClick={() => changeMonth(-1)}>‹</button>
@@ -45,9 +45,10 @@ function Calendar({ setPath }) {
           ))}
         </div>
       </section>
-      <section className="staff-empty-card compact">
-        <strong>{selectedDate ? `No events on ${monthNames[month.getMonth()]} ${selectedDate}` : 'No scheduled events'}</strong>
-        <p>{selectedDate ? 'There are no equipment events for this date.' : 'Your equipment schedule is empty.'}</p>
+      <section className="staff-empty-card compact staff-calendar-empty">
+        <span className="staff-empty-icon"><span aria-hidden="true">✦</span></span>
+        <strong>{selectedDate ? `No events on ${monthNames[month.getMonth()]} ${selectedDate}` : 'Nothing scheduled yet'}</strong>
+        <p>{selectedDate ? 'There are no equipment events for this date.' : 'Upcoming equipment events will appear here.'}</p>
       </section>
     </StaffLayout>
   )
