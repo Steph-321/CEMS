@@ -17,54 +17,61 @@ function Notifications({ setPath, reportId }) {
   if (reportId) {
     return (
       <StaffLayout setPath={setPath} activePath="notifications">
-        <button className="staff-report-back" type="button" onClick={() => navigate('/staff/notifications')}>
-          <span aria-hidden="true">←</span> All reports
-        </button>
-        {selectedReport ? (
-          <div className="staff-view-heading staff-report-detail-heading">
-            <div>
-              <span className="staff-eyebrow">MAINTENANCE REPORT</span>
-              <h1>Report details</h1>
-              <p>{selectedReport.id} · Reported {selectedReport.date}</p>
+        <div className="staff-report-detail-enter">
+          <div className="staff-report-detail-actions">
+            <button className="staff-report-back" type="button" onClick={() => navigate('/staff/notifications')}>
+              <span aria-hidden="true">←</span> All reports
+            </button>
+            <button className="staff-report-new-issue" type="button" onClick={() => navigate('/staff/scan')}>
+              <StaffIcon name="scan" /> Report an issue
+            </button>
+          </div>
+          {selectedReport ? (
+            <div className="staff-view-heading staff-report-detail-heading">
+              <div>
+                <span className="staff-eyebrow">MAINTENANCE REPORT</span>
+                <h1>Report details</h1>
+                <p>{selectedReport.id} · Reported {selectedReport.date}</p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="staff-report-not-found">
-            <span className="staff-empty-icon"><StaffIcon name="bell" /></span>
-            <h1>Report not found</h1>
-            <p>This sample report may no longer be available.</p>
-            <button type="button" onClick={() => navigate('/staff/notifications')}>Back to notifications</button>
-          </div>
-        )}
-        {selectedReport && (
-          <>
-            <section className="staff-report-detail-card">
-              <div className="staff-report-card-top">
-                <span className="staff-report-id">{selectedReport.id}</span>
-                <span className={`staff-report-status-badge ${selectedReport.status.toLowerCase()}`}>
-                  {selectedReport.status === 'Unassigned' ? 'Needs assignment' : selectedReport.status}
-                </span>
-              </div>
-              <h2>{selectedReport.asset}</h2>
-              <p>{selectedReport.issue} · {selectedReport.assetId}</p>
-              <div className="staff-report-detail-description">
-                <span>Reported details</span>
-                <p>{selectedReport.description || 'No description supplied.'}</p>
-              </div>
-            </section>
+          ) : (
+            <div className="staff-report-not-found">
+              <span className="staff-empty-icon"><StaffIcon name="bell" /></span>
+              <h1>Report not found</h1>
+              <p>This sample report may no longer be available.</p>
+              <button type="button" onClick={() => navigate('/staff/notifications')}>Back to notifications</button>
+            </div>
+          )}
+          {selectedReport && (
+            <>
+              <section className={`staff-report-detail-card staff-report-detail-status-${selectedReport.status.toLowerCase()}`}>
+                <div className="staff-report-card-top">
+                  <span className="staff-report-id">{selectedReport.id}</span>
+                  <span className={`staff-report-status-badge ${selectedReport.status.toLowerCase()}`}>
+                    {selectedReport.status === 'Unassigned' ? 'Needs assignment' : selectedReport.status}
+                  </span>
+                </div>
+                <h2>{selectedReport.asset}</h2>
+                <p>{selectedReport.issue} · {selectedReport.assetId}</p>
+                <div className="staff-report-detail-description">
+                  <span>Reported details</span>
+                  <p>{selectedReport.description || 'No description supplied.'}</p>
+                </div>
+              </section>
 
-            <section className="staff-report-detail-card staff-report-status-card">
-              <span className="staff-eyebrow">CURRENT STATUS</span>
-              <h2>{selectedReport.status === 'Unassigned' ? 'Needs assignment' : selectedReport.status}</h2>
-              <div className="staff-report-detail-fields">
-                <div><span>Severity</span><strong>{selectedReport.severity}</strong></div>
-                <div><span>Reported by</span><strong>{selectedReport.reporter}</strong></div>
-                <div><span>Assigned technician</span><strong>{selectedReport.technician}</strong></div>
-                <div><span>Report date</span><strong>{selectedReport.date}</strong></div>
-              </div>
-            </section>
-          </>
-        )}
+              <section className="staff-report-detail-card staff-report-status-card">
+                <span className="staff-eyebrow">CURRENT STATUS</span>
+                <h2>{selectedReport.status === 'Unassigned' ? 'Needs assignment' : selectedReport.status}</h2>
+                <div className="staff-report-detail-fields">
+                  <div><span>Severity</span><strong>{selectedReport.severity}</strong></div>
+                  <div><span>Reported by</span><strong>{selectedReport.reporter}</strong></div>
+                  <div><span>Assigned technician</span><strong>{selectedReport.technician}</strong></div>
+                  <div><span>Report date</span><strong>{selectedReport.date}</strong></div>
+                </div>
+              </section>
+            </>
+          )}
+        </div>
       </StaffLayout>
     )
   }

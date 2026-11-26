@@ -22,7 +22,7 @@ function StaffLayout({ setPath, activePath, children }) {
     <div className="staff-dashboard-stage">
       <div className="staff-dashboard">
         <header className="staff-dashboard-header">
-          <div className="staff-brand">
+          <div className="staff-brand staff-header-brand">
             <img src={seal} alt="" />
             <span>Campus Equipment<strong>Management System</strong></span>
           </div>
@@ -35,6 +35,11 @@ function StaffLayout({ setPath, activePath, children }) {
         <main className="staff-notifications">{children}</main>
 
         <nav className="staff-bottom-nav" aria-label="Staff navigation">
+          <div className="staff-brand staff-sidebar-brand" role="img" aria-label="Campus Equipment Management System">
+            <img src={seal} alt="" />
+            <span>Campus Equipment<strong>Management System</strong></span>
+          </div>
+          <span className="staff-nav-section-label">WORKSPACE</span>
           <button type="button" className={activePath === 'dashboard' ? 'active' : ''} aria-label="Home" title="Home" aria-current={activePath === 'dashboard' ? 'page' : undefined} onClick={() => navigate('/staff/dashboard')}><span><StaffIcon name="home" /></span><small>Home</small></button>
           <button type="button" className={activePath === 'inventory' ? 'active' : ''} aria-label="Inventory" title="Inventory" aria-current={activePath === 'inventory' ? 'page' : undefined} onClick={() => navigate('/staff/inventory')}><span><StaffIcon name="inventory" /></span><small>Inventory</small></button>
           <button type="button" className={`staff-nav-add ${activePath === 'scan' ? 'active' : ''}`} aria-label="Scan equipment" title="Scan equipment" aria-current={activePath === 'scan' ? 'page' : undefined} onClick={() => navigate('/staff/scan')}><span><StaffIcon name="scan" /></span><small>Scan</small></button>

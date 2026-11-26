@@ -3,9 +3,12 @@ import { StaffIcon } from './StaffLayout.jsx'
 function StaffReportCard({ ticket, onView, needsAction = false }) {
   const statusLabel = ticket.status === 'Unassigned' ? 'Needs assignment' : ticket.status
   const iconState = needsAction ? 'attention' : ticket.status.toLowerCase()
+  const cardStateClass = needsAction
+    ? 'staff-report-card-attention'
+    : `staff-report-card-status-${ticket.status.toLowerCase()}`
 
   return (
-    <article className={`staff-report-card ${needsAction ? 'staff-report-card-attention' : ''}`}>
+    <article className={`staff-report-card ${cardStateClass}`}>
       <div className="staff-report-card-top">
         <span className="staff-report-ident">
           <span className={`staff-report-type-icon ${iconState}`}><StaffIcon name={needsAction ? 'bell' : 'inventory'} /></span>
