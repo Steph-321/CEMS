@@ -78,6 +78,59 @@ export async function verifyLocalPassword(account, password) {
   return difference === 0
 }
 
+export async function updateLocalAccountPassword(accountId, currentPassword, newPassword) {
+  const saved = localStorage.getItem(usersStorageKey)
+  const storedUsers = saved ? JSON.parse(saved) : []
+  if (!Array.isArray(storedUsers)) {
+    throw new Error('Saved user accounts are not in the expected format.')
+  }
+
+  const storedAccount = storedUsers.find((account) => account.id === accountId)
+  const account = storedAccount
+    || [...initialUsers, defaultAdmin].find((candidate) => candidate.id === accountId)
+  if (!account) {
+    throw new Error('The account could not be found.')
+  }
+  if (!await verifyLocalPassword(account, currentPassword)) {
+    throw new Error('The current password is incorrect.')
+  }
+
+  const credential = await createLocalPasswordCredential(newPassword)
+  const updatedAccount = { ...account, ...credential }
+  const updatedUsers = storedAccount
+    ? storedUsers.map((candidate) => candidate.id === accountId ? updatedAccount : candidate)
+    : [updatedAccount, ...storedUsers]
+  localStorage.setItem(usersStorageKey, JSON.stringify(updatedUsers))
+}
+
+export function updateLocalAccountProfile(accountId, details) {
+  const name = String(details.name || '').trim()
+  const email = String(details.email || '').trim()
+  if (!name || !email) {
+    throw new Error('Name and email are required.')
+  }
+
+  const saved = localStorage.getItem(usersStorageKey)
+  const storedUsers = saved ? JSON.parse(saved) : []
+  if (!Array.isArray(storedUsers)) {
+    throw new Error('Saved user accounts are not in the expected format.')
+  }
+
+  const storedAccount = storedUsers.find((account) => account.id === accountId)
+  const account = storedAccount
+    || [...initialUsers, defaultAdmin].find((candidate) => candidate.id === accountId)
+  if (!account) {
+    throw new Error('The account could not be found.')
+  }
+
+  const updatedAccount = { ...account, name, email }
+  const updatedUsers = storedAccount
+    ? storedUsers.map((candidate) => candidate.id === accountId ? updatedAccount : candidate)
+    : [updatedAccount, ...storedUsers]
+  localStorage.setItem(usersStorageKey, JSON.stringify(updatedUsers))
+  return saveCurrentUser(updatedAccount)
+}
+
 function normalizeUsername(value) {
   return String(value || '').trim().replace(/^@/, '').toLowerCase()
 }
