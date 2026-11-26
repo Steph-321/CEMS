@@ -5,6 +5,9 @@ import { initialTickets } from '../admin/adminData.jsx'
 
 function Dashboard({ setPath }) {
   const firstName = getCurrentUser()?.name?.trim().split(/\s+/)[0]
+  const today = new Date()
+  const todayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(today)
+  const todayDateTime = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
   const needsAction = initialTickets.filter((ticket) => ticket.status === 'Unassigned')
   const recentReports = [...initialTickets].sort((first, second) => new Date(second.date) - new Date(first.date))
 
@@ -21,11 +24,10 @@ function Dashboard({ setPath }) {
         <span className="staff-eyebrow">YOUR STAFF WORKSPACE</span>
         <h1>Good day{firstName ? `, ${firstName}` : ''}</h1>
         <p>Keep track of campus equipment and stay up to date.</p>
-        <button type="button" onClick={() => navigate('/staff/scan')}>
-          <StaffIcon name="scan" />
-          Scan equipment
-          <span aria-hidden="true">→</span>
-        </button>
+        <div className="staff-welcome-today">
+          <span className="staff-welcome-date-icon"><StaffIcon name="calendar" /></span>
+          <span><small>TODAY</small><time dateTime={todayDateTime}>{todayLabel}</time></span>
+        </div>
         <span className="staff-welcome-orb" aria-hidden="true" />
       </section>
 
