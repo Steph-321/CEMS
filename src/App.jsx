@@ -14,7 +14,11 @@ import Notifications from './pages/admin/notifications.jsx'
 import ManageUsers from './pages/admin/manageUsers.jsx'
 import AddUser from './pages/admin/addUser.jsx'
 import Settings from './pages/admin/settings.jsx'
-import StaffDashboard from './pages/staff/StaffDashboard.jsx'
+import StaffDashboard from './pages/staff/dashboard.jsx'
+import StaffInventory from './pages/staff/inventory.jsx'
+import StaffCalendar from './pages/staff/calendar.jsx'
+import StaffScan from './pages/staff/scan.jsx'
+import StaffProfile from './pages/staff/profile.jsx'
 import './App.css'
 
 function App() {
@@ -41,6 +45,10 @@ function App() {
   if (path === '/admin/users') return <ManageUsers setPath={setPath} />
   if (path === '/admin/settings') return <Settings setPath={setPath} />
   if (path === '/staff' || path === '/staff/dashboard') return <StaffDashboard setPath={setPath} />
+  if (path === '/staff/inventory') return <StaffInventory setPath={setPath} />
+  if (path === '/staff/calendar') return <StaffCalendar setPath={setPath} />
+  if (path === '/staff/scan') return <StaffScan setPath={setPath} />
+  if (path === '/staff/profile') return <StaffProfile setPath={setPath} />
   return <Login setPath={setPath} />
 }
 
