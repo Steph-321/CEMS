@@ -20,6 +20,7 @@ function equipmentTypeLabel(asset) {
 function Scan({ setPath }) {
   const videoRef = useRef(null)
   const reportPanelRef = useRef(null)
+  const reportCloseTimeoutRef = useRef(null)
   const scannerControlsRef = useRef(null)
   const scanSessionRef = useRef(0)
   const scrollPositionRef = useRef(0)
@@ -27,6 +28,8 @@ function Scan({ setPath }) {
   const [asset, setAsset] = useState(null)
   const [lookupMessage, setLookupMessage] = useState('')
   const [reportOpen, setReportOpen] = useState(false)
+  const [reportMounted, setReportMounted] = useState(false)
+  const [reportClosing, setReportClosing] = useState(false)
   const [cameraState, setCameraState] = useState('idle')
   const [cameraMessage, setCameraMessage] = useState('')
   const [floatingButtonVisible, setFloatingButtonVisible] = useState(true)
@@ -62,7 +65,12 @@ function Scan({ setPath }) {
     return () => window.removeEventListener('scroll', handleWindowScroll)
   }, [updateFloatingButtonVisibility])
 
-  useEffect(() => () => scannerControlsRef.current?.stop(), [])
+  useEffect(() => () => {
+    scannerControlsRef.current?.stop()
+    if (reportCloseTimeoutRef.current !== null) {
+      window.clearTimeout(reportCloseTimeoutRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     if (!reportOpen) return
@@ -82,6 +90,31 @@ function Scan({ setPath }) {
     setPath(path)
   }
 
+  const openReport = () => {
+    if (reportCloseTimeoutRef.current !== null) {
+      window.clearTimeout(reportCloseTimeoutRef.current)
+      reportCloseTimeoutRef.current = null
+    }
+    setReportMounted(true)
+    setReportClosing(false)
+    setReportOpen(true)
+  }
+
+  const closeReport = () => {
+    setReportOpen(false)
+    setReportClosing(true)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setReportMounted(false)
+      setReportClosing(false)
+      return
+    }
+    reportCloseTimeoutRef.current = window.setTimeout(() => {
+      setReportMounted(false)
+      setReportClosing(false)
+      reportCloseTimeoutRef.current = null
+    }, 220)
+  }
+
   const applyScannedCode = (value) => {
     const code = value.trim()
     const match = findEquipment(code, equipmentList)
@@ -91,7 +124,7 @@ function Scan({ setPath }) {
     setLookupMessage(match
       ? `${match.name} identified in ${match.location}.`
       : 'QR code scanned. Add the equipment name and confirm the asset tag below.')
-    setReportOpen(true)
+    openReport()
     setReportError('')
     setCameraState('detected')
     setCameraMessage('QR code detected. Confirm the equipment details below.')
@@ -171,7 +204,7 @@ function Scan({ setPath }) {
 
   const toggleManualReport = () => {
     if (reportOpen) {
-      setReportOpen(false)
+      closeReport()
       return
     }
     setAsset(null)
@@ -179,7 +212,7 @@ function Scan({ setPath }) {
     setAssetTag('')
     setLookupMessage('')
     setReportError('')
-    setReportOpen(true)
+    openReport()
   }
 
   const lookupAsset = (event) => {
@@ -197,7 +230,7 @@ function Scan({ setPath }) {
     setLookupMessage(match
       ? `${match.name} found in ${match.location}.`
       : `No equipment found for “${query}”. Enter the equipment details below.`)
-    setReportOpen(true)
+    openReport()
     setReportError('')
     setSuggestionsOpen(false)
   }
@@ -256,17 +289,18 @@ function Scan({ setPath }) {
     error: 'Camera unavailable',
   }[cameraState]
   const cameraDescription = cameraMessage || 'Allow camera access, then point your camera at an equipment QR code.'
+  const fabVisible = floatingButtonVisible || reportOpen
   const floatingAction = (
     <button
       type="button"
-      className={`staff-scan-fab ${floatingButtonVisible ? 'visible' : 'hidden'} ${reportOpen ? 'open' : ''}`}
+      className={`staff-scan-fab ${fabVisible ? 'visible' : 'hidden'} ${reportOpen ? 'open' : ''}`}
       aria-label={reportOpen ? 'Close report details' : 'Add equipment manually'}
       aria-expanded={reportOpen}
-      aria-hidden={!floatingButtonVisible}
-      tabIndex={floatingButtonVisible ? 0 : -1}
+      aria-hidden={!fabVisible}
+      tabIndex={fabVisible ? 0 : -1}
       onClick={toggleManualReport}
     >
-      <span aria-hidden="true">{reportOpen ? '×' : '+'}</span>
+      <span aria-hidden="true">+</span>
     </button>
   )
 
@@ -385,8 +419,14 @@ function Scan({ setPath }) {
         </section>
       )}
 
-      {reportOpen && (
-        <section ref={reportPanelRef} className="staff-scan-report" aria-label="Maintenance report details">
+      {reportMounted && (
+        <section
+          ref={reportPanelRef}
+          className={`staff-scan-report ${reportClosing ? 'closing' : ''}`}
+          aria-label="Maintenance report details"
+          aria-hidden={reportClosing}
+          inert={reportClosing}
+        >
           <form className="staff-report-form" onSubmit={saveReport}>
             <div className="staff-scan-form-heading">
               <span><strong>Report details</strong><small>Required fields are marked with *</small></span>

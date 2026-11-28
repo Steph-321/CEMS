@@ -731,6 +731,7 @@
 @media (prefers-reduced-motion: reduce) {
   .staff-notifications,
   .staff-report-detail-enter,
+  .staff-scan-report,
   .staff-scan-target,
   .staff-scan-fab,
   .staff-scan-camera-video,
@@ -742,7 +743,10 @@
 
   .staff-report-card,
   .staff-report-view,
-  .staff-report-metric {
+  .staff-report-metric,
+  .staff-scan-fab,
+  .staff-scan-fab span,
+  .staff-scan-report {
     transition: none;
   }
 }
@@ -4119,6 +4123,18 @@
   animation: staff-ui-rise-in .3s cubic-bezier(.2, .75, .25, 1) both;
 }
 
+.staff-scan-report.closing {
+  animation: staff-scan-report-close .22s ease-in both;
+  pointer-events: none;
+}
+
+@keyframes staff-scan-report-close {
+  to {
+    opacity: 0;
+    transform: translate3d(0, 9px, 0) scale(.985);
+  }
+}
+
 .staff-scan-lookup-wrap {
   position: relative;
   z-index: 3;
@@ -7214,10 +7230,16 @@
 }
 
 .staff-scan-fab span {
+  display: block;
   margin-top: -3px;
   font-size: 34px;
   font-weight: 400;
   line-height: 1;
+  transition: transform .24s cubic-bezier(.2, .75, .25, 1);
+}
+
+.staff-scan-fab.open span {
+  transform: rotate(45deg);
 }
 
 .staff-scan-fab.open {
