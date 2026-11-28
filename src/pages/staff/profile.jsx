@@ -217,18 +217,12 @@ function Profile({ setPath }) {
             </button>
           </section>
 
-          <button type="button" className="staff-profile-task-button" onClick={() => navigate('/staff/notifications')}>
-            View Assign Task
-          </button>
-
           {editingProfile ? (
-            <div className="staff-profile-actions staff-profile-edit-actions">
-              <button type="button" className="staff-profile-logout-button" onClick={cancelProfileEdit}>Cancel</button>
+            <div className="staff-profile-actions">
               <button type="button" className="staff-profile-save-button" onClick={requestProfileSave}>Save Changes</button>
             </div>
           ) : (
             <div className="staff-profile-actions">
-              <button type="button" className="staff-profile-save-button" onClick={() => setModal('no-changes')}>Save Changes</button>
               <button type="button" className="staff-profile-logout-button" onClick={() => setModal('logout')}>Log Out</button>
             </div>
           )}
@@ -368,7 +362,7 @@ function ProfileModal({ type, onClose, onConfirm }) {
     },
     'no-changes': {
       title: 'No changes to save',
-      message: 'Your name and email are read-only. Nothing has been changed.',
+      message: 'Your name and email are already up to date. Nothing has been changed.',
       confirm: 'Got it',
     },
     'password-updated': {

@@ -731,7 +731,10 @@
 @media (prefers-reduced-motion: reduce) {
   .staff-notifications,
   .staff-report-detail-enter,
-  .staff-scan-frame,
+  .staff-scan-target,
+  .staff-scan-fab,
+  .staff-scan-camera-video,
+  .staff-scan-camera-button,
   .staff-report-metric,
   .staff-report-card {
     animation: none;
@@ -1754,33 +1757,6 @@
   color: #7d8ca1;
   font-size: 10px;
   line-height: 1.35;
-}
-
-.staff-inventory-scan {
-  min-height: 40px;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  border: 0;
-  border-radius: 999px;
-  background: #ef3b43;
-  padding: 0 14px;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  transition: background-color .18s ease, transform .18s ease;
-}
-
-.staff-inventory-scan:hover {
-  background: #d93038;
-  transform: translateY(-1px);
-}
-
-.staff-inventory-scan svg {
-  width: 16px;
-  height: 16px;
 }
 
 .staff-inventory-search-row {
@@ -2904,16 +2880,6 @@
   line-height: 1.5;
 }
 
-.staff-inventory-empty-reset {
-  border: 1px solid #f0bfc2;
-  border-radius: 999px;
-  background: #fff7f7;
-  padding: 8px 14px;
-  color: #d9363e;
-  font-size: 10px;
-  font-weight: 700;
-}
-
 .staff-schedule-calendar {
   max-width: 900px;
   overflow: hidden;
@@ -3523,38 +3489,6 @@
   font-size: 8px;
 }
 
-.staff-schedule-create-fab {
-  position: relative;
-  z-index: 1;
-  width: 46px;
-  height: 46px;
-  display: grid;
-  place-items: center;
-  margin: -23px 18px 18px auto;
-  border: 0;
-  border-radius: 50%;
-  background: #ef3b43;
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(198, 45, 54, .3);
-  font-size: 27px;
-  font-weight: 400;
-  line-height: 1;
-  transition: background-color .18s ease, transform .18s ease, opacity .18s ease, visibility 0s;
-}
-
-.staff-schedule-create-fab:hover {
-  background: #d93038;
-  transform: translateY(-2px);
-}
-
-.staff-notifications.staff-page-scrolled .staff-schedule-create-fab {
-  opacity: 0;
-  transform: translateY(5px) scale(.9);
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
-}
-
 .staff-schedule-form-page,
 .staff-schedule-detail-page {
   max-width: 760px;
@@ -4009,58 +3943,159 @@
 
 }
 
-.staff-scan-preview {
-  min-height: 230px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed #d9e0e8;
-  border-radius: 18px;
-  background: linear-gradient(145deg, #fff 0%, #f5f7fb 100%);
-  padding: 24px;
+.staff-scan-camera-card {
+  display: grid;
+  gap: 14px;
+  border: 1px solid #e8edf2;
+  border-radius: 17px;
+  background: #fff;
+  padding: 13px;
+  box-shadow: 0 6px 18px rgba(38, 54, 77, .045);
+}
+
+.staff-scan-camera-stage {
+  position: relative;
+  min-height: 210px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: radial-gradient(circle at center, #314760 0%, #17283e 68%, #122136 100%);
+  color: #fff;
+}
+
+.staff-scan-camera-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #17283e;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+.staff-scan-camera-stage.active .staff-scan-camera-video {
+  opacity: 1;
+}
+
+.staff-scan-camera-placeholder {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 11px;
+  padding: 18px;
+  color: rgba(255, 255, 255, .86);
   text-align: center;
 }
 
-.staff-scan-frame {
-  width: 74px;
-  height: 74px;
+.staff-scan-camera-placeholder span {
+  width: 54px;
+  height: 54px;
   display: grid;
   place-items: center;
-  border: 1px solid #f5c5c7;
-  border-radius: 21px;
-  background: #fff;
-  color: #ef3b43;
-  margin-bottom: 15px;
-  box-shadow: 0 8px 18px rgba(239, 59, 67, .1);
-  animation: scan-float 3s ease-in-out infinite;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .1);
 }
 
-@keyframes scan-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+.staff-scan-camera-placeholder svg {
+  width: 28px;
+  height: 28px;
 }
 
-.staff-scan-frame svg {
-  width: 38px;
-  height: 38px;
-}
-
-.staff-scan-preview strong {
-  color: #26364d;
+.staff-scan-camera-placeholder strong {
   font-size: 12px;
 }
 
-.staff-scan-preview p {
-  max-width: 230px;
-  margin: 7px 0 0;
-  color: #98a4b3;
-  font-size: 10px;
+.staff-scan-target {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 142px;
+  height: 142px;
+  border: 2px solid rgba(255, 255, 255, .9);
+  border-radius: 19px;
+  box-shadow: 0 0 0 999px rgba(8, 18, 30, .13);
+  transform: translate(-50%, -50%);
+  animation: staff-scan-target-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes staff-scan-target-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.035); }
+}
+
+.staff-scan-camera-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 2px 3px 4px;
+}
+
+.staff-scan-camera-copy h2 {
+  margin: 0;
+  color: #26364d;
+  font-size: 16px;
+  letter-spacing: -.025em;
+}
+
+.staff-scan-camera-copy p {
+  margin: 0;
+  color: #8492a6;
+  font-size: 11px;
   line-height: 1.5;
 }
 
+.staff-scan-camera-copy p[role="alert"] {
+  color: #b4232d;
+}
+
+.staff-scan-camera-button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ef3b43;
+  border-radius: 10px;
+  background: #ef3b43;
+  padding: 0 15px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 5px 13px rgba(216, 47, 55, .16);
+  transition: background-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.staff-scan-camera-button:hover {
+  border-color: #d93038;
+  background: #d93038;
+  box-shadow: 0 7px 17px rgba(216, 47, 55, .22);
+  transform: translateY(-1px);
+}
+
+.staff-scan-camera-button.secondary {
+  border-color: #dce3eb;
+  background: #f7f9fb;
+  color: #46576d;
+  box-shadow: none;
+}
+
+.staff-scan-camera-button.secondary:hover {
+  border-color: #c8d2df;
+  background: #eef2f6;
+}
+
 .staff-scan-form {
-  margin-top: 18px;
+  margin-top: 13px;
+  border: 1px solid #e8edf2;
+  border-radius: 14px;
+  background: #fff;
+  padding: 13px;
+  box-shadow: 0 4px 12px rgba(38, 54, 77, .03);
 }
 
 .staff-scan-message {
@@ -4073,28 +4108,20 @@
   font-size: 10px;
 }
 
-.staff-scan-report-trigger {
-  width: 100%;
-  height: 44px;
-  border: 1px solid #f0c4c6;
-  border-radius: 11px;
-  background: #fff;
-  color: #ef3b43;
-  margin-top: 12px;
-  font-size: 11px;
-  font-weight: 700;
-  transition: background-color .2s ease, transform .2s ease;
-}
-
-.staff-scan-report-trigger:hover {
-  transform: translateY(-1px);
-  background: #fff7f7;
-}
-
 .staff-scan-report {
   margin-top: 14px;
-  border-top: 1px solid #edf0f3;
-  padding-top: 14px;
+  border: 1px solid #e8edf2;
+  border-radius: 14px;
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(38, 54, 77, .035);
+  scroll-margin-top: 18px;
+  animation: staff-ui-rise-in .3s cubic-bezier(.2, .75, .25, 1) both;
+}
+
+.staff-scan-lookup-wrap {
+  position: relative;
+  z-index: 3;
 }
 
 .staff-scan-lookup {
@@ -4108,14 +4135,72 @@
 }
 
 .staff-scan-lookup button {
+  min-width: 84px;
+  min-height: 42px;
   flex: 0 0 auto;
   border: 0;
-  border-radius: 7px;
+  border-radius: 10px;
   background: #ef3b43;
-  padding: 0 13px;
+  padding: 0 15px;
   color: #fff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
+  box-shadow: 0 4px 10px rgba(216, 47, 55, .15);
+  transition: background-color .18s ease, transform .18s ease;
+}
+
+.staff-scan-lookup button:hover {
+  background: #d93038;
+  transform: translateY(-1px);
+}
+
+.staff-scan-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 5;
+  display: grid;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid #e4e9ef;
+  border-radius: 11px;
+  background: #fff;
+  padding: 5px;
+  box-shadow: 0 12px 28px rgba(32, 45, 64, .14);
+}
+
+.staff-scan-suggestions button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  padding: 9px 10px;
+  color: #29364a;
+  text-align: left;
+  cursor: pointer;
+}
+
+.staff-scan-suggestions button:hover,
+.staff-scan-suggestions button.active {
+  background: #f3f6f9;
+}
+
+.staff-scan-suggestions button:focus-visible {
+  outline: 2px solid #ef3b43;
+  outline-offset: -2px;
+}
+
+.staff-scan-suggestions button span {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.staff-scan-suggestions button small {
+  color: #778397;
+  font-size: 9px;
 }
 
 .staff-scan-asset-card {
@@ -4127,6 +4212,7 @@
   border-radius: 11px;
   background: #fff;
   padding: 11px;
+  animation: staff-ui-rise-in .28s cubic-bezier(.2, .75, .25, 1) both;
 }
 
 .staff-scan-asset-icon {
@@ -4168,10 +4254,15 @@
 
 .staff-scan-form-heading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 3px;
+}
+
+.staff-scan-form-heading > span {
+  display: grid;
+  gap: 4px;
 }
 
 .staff-scan-form-heading strong {
@@ -4216,6 +4307,31 @@
   color: #69778a;
   font-size: 9px;
   font-weight: 700;
+}
+
+.staff-report-form .staff-scan-severity button {
+  height: 36px;
+  min-height: 36px;
+  border: 1px solid #dfe5ec;
+  border-radius: 999px;
+  background: #f7f9fb;
+  color: #53647b;
+  font-size: 10px;
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.staff-report-form .staff-scan-severity button:hover {
+  border-color: #ef9b9f;
+  background: #fff7f7;
+  color: #c82b33;
+  transform: translateY(-1px);
+}
+
+.staff-report-form .staff-scan-severity button.selected {
+  border-color: #ef3b43;
+  background: #ef3b43;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(216, 47, 55, .18);
 }
 
 .staff-scan-severity button.selected {
@@ -6490,7 +6606,6 @@
   font-size: 17px;
 }
 
-.staff-profile-task-button,
 .staff-profile-save-button,
 .staff-profile-logout-button {
   width: 100%;
@@ -6501,14 +6616,6 @@
   transition: background-color .2s ease, border-color .2s ease, transform .2s ease;
 }
 
-.staff-profile-task-button {
-  border: 1px solid #f0c4c6;
-  background: #fff;
-  color: #ef3b43;
-  margin-top: 9px;
-}
-
-.staff-profile-task-button:hover,
 .staff-profile-logout-button:hover {
   background: #fff5f5;
 }
@@ -6765,7 +6872,6 @@
 .staff-profile-row-action:focus-visible,
 .staff-profile-edit-button:focus-visible,
 .staff-profile-option:focus-visible,
-.staff-profile-task-button:focus-visible,
 .staff-profile-save-button:focus-visible,
 .staff-profile-logout-button:focus-visible,
 .staff-profile-back:focus-visible,
@@ -6790,7 +6896,6 @@
     animation: none;
   }
 
-  .staff-profile-task-button,
   .staff-profile-save-button,
   .staff-profile-logout-button {
     transition: none;
@@ -6876,11 +6981,11 @@
   font-size: 12px;
 }
 
-.staff-dashboard .staff-scan-preview strong {
+.staff-dashboard .staff-scan-camera-placeholder strong {
   font-size: 15px;
 }
 
-.staff-dashboard .staff-scan-preview p,
+.staff-dashboard .staff-scan-camera-copy p,
 .staff-dashboard .staff-scan-message {
   font-size: 12px;
 }
@@ -6902,7 +7007,6 @@
 .staff-dashboard .staff-profile-section-label,
 .staff-dashboard .staff-profile-row-action,
 .staff-dashboard .staff-profile-option,
-.staff-dashboard .staff-profile-task-button,
 .staff-dashboard .staff-profile-save-button,
 .staff-dashboard .staff-profile-logout-button {
   font-size: 12px;
@@ -6999,5 +7103,246 @@
     background: #ef3b43;
     content: '';
     margin: 0 7px 1px 0;
+  }
+}
+
+.staff-inventory-hero {
+  border-radius: 18px;
+  padding: 16px 18px;
+}
+
+.staff-inventory-hero-content h1 {
+  font-size: 19px;
+}
+
+.staff-inventory-hero-content div > small:first-child {
+  margin-bottom: 4px;
+  color: #98a4b3;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.staff-inventory-hero-content div > span {
+  margin-top: 3px;
+}
+
+.staff-view-heading .staff-schedule-create-button {
+  min-height: 40px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 10px;
+  background: #ef3b43;
+  padding: 0 13px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 5px 12px rgba(198, 45, 54, .16);
+  transition: background-color .18s ease, transform .18s ease;
+}
+
+.staff-view-heading .staff-schedule-create-button:hover {
+  background: #d93038;
+  transform: translateY(-1px);
+}
+
+.staff-view-heading .staff-schedule-create-button span {
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.staff-scan-report {
+  max-width: 820px;
+}
+
+.staff-profile-account-card,
+.staff-profile-info-card,
+.staff-profile-links {
+  border-radius: 15px;
+}
+
+.staff-profile-account-card {
+  padding: 17px;
+}
+
+.staff-profile-info-card {
+  margin-top: 12px;
+  padding: 15px 17px;
+}
+
+.staff-profile-links {
+  margin-top: 12px;
+  padding: 0 16px;
+}
+
+.staff-profile-actions {
+  margin-top: 16px;
+}
+
+.staff-profile-edit-button:focus-visible,
+.staff-view-heading .staff-schedule-create-button:focus-visible {
+  outline: 3px solid rgba(239, 59, 67, .28);
+  outline-offset: 3px;
+}
+
+.staff-scan-fab {
+  position: fixed;
+  z-index: 6;
+  right: 20px;
+  bottom: calc(96px + env(safe-area-inset-bottom));
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f64b53, #dc3039);
+  color: #fff;
+  box-shadow: 0 9px 22px rgba(190, 41, 49, .28), 0 2px 6px rgba(27, 43, 68, .15);
+  transition: opacity .2s ease, transform .24s cubic-bezier(.2, .75, .25, 1), background-color .18s ease, box-shadow .18s ease;
+}
+
+.staff-scan-fab:hover {
+  background: linear-gradient(145deg, #ed3d46, #c92731);
+  box-shadow: 0 12px 25px rgba(190, 41, 49, .34), 0 3px 8px rgba(27, 43, 68, .17);
+  transform: translateY(-3px) scale(1.04);
+}
+
+.staff-scan-fab span {
+  margin-top: -3px;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.staff-scan-fab.open {
+  background: #26364d;
+  box-shadow: 0 8px 20px rgba(27, 43, 68, .25);
+}
+
+.staff-scan-fab.open:hover {
+  background: #1c2b40;
+}
+
+.staff-scan-fab.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px) scale(.82);
+  visibility: hidden;
+}
+
+.staff-scan-fab.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  visibility: visible;
+}
+
+@media (min-width: 681px) {
+  .staff-inventory-hero {
+    min-height: 104px;
+    padding: 20px 24px;
+  }
+
+  .staff-inventory-hero-content h1 {
+    font-size: 23px;
+  }
+
+  .staff-inventory-hero-content div > span {
+    font-size: 12px;
+  }
+
+  .staff-scan-camera-card {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+    align-items: stretch;
+    gap: 18px;
+    padding: 16px;
+  }
+
+  .staff-scan-camera-stage {
+    min-height: 220px;
+  }
+
+  .staff-scan-camera-copy {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .staff-scan-camera-copy h2 {
+    font-size: 19px;
+  }
+
+  .staff-scan-camera-copy p {
+    font-size: 13px;
+  }
+
+  .staff-scan-form,
+  .staff-scan-report {
+    max-width: 820px;
+  }
+
+  .staff-scan-report {
+    margin-top: 18px;
+    padding: 22px;
+  }
+
+  .staff-profile-page {
+    max-width: 760px;
+  }
+
+  .staff-profile-account-card {
+    padding: 22px;
+  }
+
+  .staff-scan-fab {
+    right: 34px;
+    bottom: 30px;
+  }
+}
+
+@media (max-width: 680px) {
+  .staff-scan-camera-stage {
+    min-height: 150px;
+  }
+}
+
+@media (max-width: 380px) {
+  .staff-view-heading .staff-schedule-create-button {
+    min-height: 36px;
+    gap: 4px;
+    padding: 0 9px;
+    font-size: 10px;
+  }
+
+  .staff-scan-camera-card {
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .staff-scan-camera-stage {
+    min-height: 130px;
+  }
+
+  .staff-scan-target {
+    width: 112px;
+    height: 112px;
+  }
+
+  .staff-scan-fab {
+    right: 16px;
+    width: 54px;
+    height: 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .staff-view-heading .staff-schedule-create-button,
+  .staff-scan-target {
+    transition: none;
+    animation: none;
   }
 }

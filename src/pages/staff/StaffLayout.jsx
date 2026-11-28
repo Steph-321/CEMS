@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import seal from '../../assets/campus-seal.png'
 
 export function StaffIcon({ name }) {
@@ -16,17 +15,10 @@ export function StaffIcon({ name }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{icons[name]}</svg>
 }
 
-function StaffLayout({ setPath, activePath, children }) {
-  const [isContentScrolled, setIsContentScrolled] = useState(false)
-
+function StaffLayout({ setPath, activePath, children, onContentScroll, floatingAction }) {
   const navigate = (path) => {
     window.history.pushState({}, '', path)
     setPath(path)
-  }
-
-  const handleContentScroll = (event) => {
-    const isScrolled = event.currentTarget.scrollTop > 0
-    setIsContentScrolled((current) => current === isScrolled ? current : isScrolled)
   }
 
   return (
@@ -45,11 +37,13 @@ function StaffLayout({ setPath, activePath, children }) {
 
         <main
           key={window.location.pathname}
-          className={`staff-notifications${activePath === 'calendar' && isContentScrolled ? ' staff-page-scrolled' : ''}`}
-          onScroll={activePath === 'calendar' ? handleContentScroll : undefined}
+          className="staff-notifications"
+          onScroll={onContentScroll}
         >
           {children}
         </main>
+
+        {floatingAction}
 
         <nav className="staff-bottom-nav" aria-label="Staff navigation">
           <div className="staff-brand staff-sidebar-brand" role="img" aria-label="Campus Equipment Management System">

@@ -10,7 +10,9 @@ function Dashboard({ setPath }) {
   const todayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(today)
   const todayDateTime = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
   const needsAction = tickets.filter((ticket) => ticket.status === 'Unassigned')
-  const recentReports = [...tickets].sort((first, second) => new Date(second.date) - new Date(first.date))
+  const recentReports = [...tickets]
+    .filter((ticket) => ticket.status !== 'Unassigned')
+    .sort((first, second) => new Date(second.date) - new Date(first.date))
 
   const navigate = (path) => {
     window.history.pushState({}, '', path)
@@ -35,7 +37,7 @@ function Dashboard({ setPath }) {
       <section className="staff-report-metrics" aria-label="Report overview">
         <article className="staff-report-metric">
           <span className="staff-report-metric-icon"><StaffIcon name="inventory" /></span>
-          <span><small>Sample reports</small><strong>{recentReports.length}</strong></span>
+          <span><small>Total reports</small><strong>{tickets.length}</strong></span>
           <span className="staff-report-metric-accent" aria-hidden="true">↗</span>
         </article>
         <article className="staff-report-metric attention">
@@ -75,15 +77,23 @@ function Dashboard({ setPath }) {
           <div><span className="staff-eyebrow">SAMPLE MAINTENANCE</span><h2>Recent reports</h2></div>
           <span className="staff-notice-total">{recentReports.length} reports</span>
         </div>
-        <div className="staff-report-list">
-          {recentReports.map((ticket) => (
-            <StaffReportCard
-              key={ticket.id}
-              ticket={ticket}
-              onView={viewReport}
-            />
-          ))}
-        </div>
+        {recentReports.length ? (
+          <div className="staff-report-list">
+            {recentReports.map((ticket) => (
+              <StaffReportCard
+                key={ticket.id}
+                ticket={ticket}
+                onView={viewReport}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="staff-notice-empty">
+            <span className="staff-empty-icon"><StaffIcon name="inventory" /></span>
+            <strong>No other reports yet</strong>
+            <p>Reports needing follow-up are shown above.</p>
+          </div>
+        )}
       </section>
     </StaffLayout>
   )

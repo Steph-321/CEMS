@@ -209,11 +209,6 @@ function Inventory({ setPath }) {
     setSortMode('recent')
   }
 
-  const navigateToScan = () => {
-    window.history.pushState({}, '', '/staff/scan')
-    setPath('/staff/scan')
-  }
-
   const openItemLog = (assetId) => {
     window.history.pushState({}, '', `/staff/inventory/${assetId}`)
     setPath(`/staff/inventory/${assetId}`)
@@ -235,15 +230,11 @@ function Inventory({ setPath }) {
           <div className="staff-inventory-hero-content">
             <span className="staff-inventory-hero-icon"><StaffIcon name="computer" /></span>
             <div>
+              <small>CTU CAMPUS · INVENTORY</small>
               <h1>Equipment</h1>
-              <span>CTU Campus</span>
-              <small>Inventory</small>
+              <span>Browse and update campus equipment.</span>
             </div>
           </div>
-          <button type="button" className="staff-inventory-scan" onClick={navigateToScan}>
-            <StaffIcon name="scan" />
-            <span>Scan equipment</span>
-          </button>
         </section>
 
         <div className="staff-inventory-search-row">
@@ -325,9 +316,11 @@ function Inventory({ setPath }) {
               <option value="status">Status</option>
             </select>
           </label>
-          <button type="button" className="staff-inventory-reset" onClick={resetFilters} disabled={!hasActiveFilters}>
-            Reset filters
-          </button>
+          {hasActiveFilters && (
+            <button type="button" className="staff-inventory-reset" onClick={resetFilters}>
+              Reset filters
+            </button>
+          )}
         </div>
 
         <div className="staff-inventory-export-actions" aria-label="Export all equipment logs">
@@ -472,7 +465,6 @@ function Inventory({ setPath }) {
             <span className="staff-empty-icon"><StaffIcon name="inventory" /></span>
             <strong>No matching equipment</strong>
             <p>Try another search or reset your filters to see all registered equipment.</p>
-            <button type="button" className="staff-inventory-empty-reset" onClick={resetFilters}>Reset filters</button>
           </section>
         )}
       </div>

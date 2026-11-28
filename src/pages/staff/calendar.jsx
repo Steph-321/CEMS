@@ -170,6 +170,9 @@ function Calendar({ setPath }) {
         <div className="staff-schedule-page">
           <div className="staff-view-heading">
             <div><span className="staff-eyebrow">PLAN AHEAD</span><h1>Calendar</h1><p>Keep an eye on equipment events.</p></div>
+            <button type="button" className="staff-schedule-create-button" onClick={startCreate}>
+              <span aria-hidden="true">+</span> New schedule
+            </button>
           </div>
 
           <section className="staff-schedule-calendar">
@@ -284,8 +287,6 @@ function Calendar({ setPath }) {
               </div>
             )}
           </section>
-
-          <button type="button" className="staff-schedule-create-fab" aria-label="Create schedule" onClick={startCreate}>+</button>
 
           {view !== 'Agenda' && (
             <section className="staff-schedule-selected-agenda" aria-live="polite">
@@ -414,7 +415,7 @@ function EmptyScheduleMessage({ message }) {
     <div className="staff-schedule-empty">
       <span className="staff-schedule-empty-icon"><StaffIcon name="calendar" /></span>
       <strong>{message}</strong>
-      <span>Use the + button to add a schedule.</span>
+      <span>Use New schedule to add an event.</span>
     </div>
   )
 }
