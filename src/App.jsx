@@ -22,7 +22,17 @@ import StaffScan from './pages/staff/scan.jsx'
 import StaffProfile from './pages/staff/profile.jsx'
 import StaffItemLog from './pages/staff/itemLog.jsx'
 import StaffRepair from './pages/staff/staffRepair.jsx'
+import { getCurrentUser } from './pages/auth/localAuth.js'
 import './App.css'
+
+function isAdminLoggedIn() {
+  try {
+    const user = getCurrentUser()
+    return user !== null && user.role === 'Administrator'
+  } catch {
+    return false
+  }
+}
 
 function App() {
   const [path, setPath] = useState(window.location.pathname)
@@ -33,7 +43,23 @@ function App() {
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
 
-  if (path === '/admin' || path === '/admin/dashboard') return <AdminDashboard setPath={setPath} />
+  const navigate = (to) => {
+    window.history.pushState({}, '', to)
+    setPath(to)
+  }
+
+  // Admin welcome landing page — same as login
+  if (path === '/admin' || path === '/login') return <Login setPath={setPath} />
+
+  // Admin route guard — any /admin/* requires an active admin session
+  if (path.startsWith('/admin/')) {
+    if (!isAdminLoggedIn()) {
+      navigate('/login')
+      return null
+    }
+  }
+
+  if (path === '/admin/dashboard') return <AdminDashboard setPath={setPath} />
   if (path === '/admin/equipment') return <ManageEquipment setPath={setPath} />
   if (path === '/admin/categories') return <EquipmentCategories setPath={setPath} />
   if (path === '/admin/status') return <EquipmentStatus setPath={setPath} />

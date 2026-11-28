@@ -76,7 +76,7 @@ function AdminLayout({ setPath, active, title, children }) {
 
   const logout = () => {
     clearCurrentUser()
-    navigate('/')
+    navigate('/admin')
   }
 
   const saveProfile = (event) => {
