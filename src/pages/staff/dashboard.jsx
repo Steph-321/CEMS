@@ -1,15 +1,16 @@
 import StaffLayout, { StaffIcon } from './StaffLayout.jsx'
 import StaffReportCard from './StaffReportCard.jsx'
+import { getStaffTickets } from './staffMaintenance.js'
 import { getCurrentUser } from '../auth/localAuth.js'
-import { initialTickets } from '../admin/adminData.jsx'
 
 function Dashboard({ setPath }) {
+  const tickets = getStaffTickets()
   const firstName = getCurrentUser()?.name?.trim().split(/\s+/)[0]
   const today = new Date()
   const todayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(today)
   const todayDateTime = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-  const needsAction = initialTickets.filter((ticket) => ticket.status === 'Unassigned')
-  const recentReports = [...initialTickets].sort((first, second) => new Date(second.date) - new Date(first.date))
+  const needsAction = tickets.filter((ticket) => ticket.status === 'Unassigned')
+  const recentReports = [...tickets].sort((first, second) => new Date(second.date) - new Date(first.date))
 
   const navigate = (path) => {
     window.history.pushState({}, '', path)
@@ -52,7 +53,12 @@ function Dashboard({ setPath }) {
         {needsAction.length ? (
           <div className="staff-report-list">
             {needsAction.map((ticket) => (
-              <StaffReportCard key={ticket.id} ticket={ticket} needsAction onView={viewReport} />
+              <StaffReportCard
+                key={ticket.id}
+                ticket={ticket}
+                onView={viewReport}
+                needsAction
+              />
             ))}
           </div>
         ) : (
@@ -71,7 +77,11 @@ function Dashboard({ setPath }) {
         </div>
         <div className="staff-report-list">
           {recentReports.map((ticket) => (
-            <StaffReportCard key={ticket.id} ticket={ticket} onView={viewReport} />
+            <StaffReportCard
+              key={ticket.id}
+              ticket={ticket}
+              onView={viewReport}
+            />
           ))}
         </div>
       </section>

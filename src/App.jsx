@@ -20,6 +20,8 @@ import StaffInventory from './pages/staff/inventory.jsx'
 import StaffCalendar from './pages/staff/calendar.jsx'
 import StaffScan from './pages/staff/scan.jsx'
 import StaffProfile from './pages/staff/profile.jsx'
+import StaffItemLog from './pages/staff/itemLog.jsx'
+import StaffRepair from './pages/staff/staffRepair.jsx'
 import './App.css'
 
 function App() {
@@ -50,7 +52,14 @@ function App() {
     return <StaffNotifications setPath={setPath} reportId={path.slice('/staff/notifications/'.length)} />
   }
   if (path === '/staff/notifications') return <StaffNotifications setPath={setPath} />
+  if (path.startsWith('/staff/repair/')) {
+    const [ticketId, view] = path.slice('/staff/repair/'.length).split('/')
+    return <StaffRepair setPath={setPath} ticketId={ticketId} showResult={view === 'result'} />
+  }
   if (path === '/staff/inventory') return <StaffInventory setPath={setPath} />
+  if (path.startsWith('/staff/inventory/')) {
+    return <StaffItemLog setPath={setPath} assetId={path.slice('/staff/inventory/'.length)} />
+  }
   if (path === '/staff/calendar') return <StaffCalendar setPath={setPath} />
   if (path === '/staff/scan') return <StaffScan setPath={setPath} />
   if (path === '/staff/profile') return <StaffProfile setPath={setPath} />

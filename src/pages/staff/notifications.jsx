@@ -1,11 +1,17 @@
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import StaffLayout, { StaffIcon } from './StaffLayout.jsx'
 import StaffReportCard from './StaffReportCard.jsx'
-import { initialTickets } from '../admin/adminData.jsx'
+import EquipmentUpdateButton from './EquipmentUpdateButton.jsx'
+import { getStaffEquipment, getStaffTickets } from './staffMaintenance.js'
 
 function Notifications({ setPath, reportId }) {
-  const needsAction = initialTickets.filter((ticket) => ticket.status === 'Unassigned')
-  const recentReports = [...initialTickets].sort((first, second) => new Date(second.date) - new Date(first.date))
-  const selectedReport = initialTickets.find((ticket) => ticket.id === reportId)
+  const tickets = getStaffTickets()
+  const [equipmentList, setEquipmentList] = useState(getStaffEquipment)
+  const needsAction = tickets.filter((ticket) => ticket.status === 'Unassigned')
+  const recentReports = [...tickets].sort((first, second) => new Date(second.date) - new Date(first.date))
+  const selectedReport = tickets.find((ticket) => ticket.id === reportId)
+  const selectedEquipment = selectedReport && equipmentList.find((asset) => asset.id === selectedReport.assetId)
 
   const navigate = (path) => {
     window.history.pushState({}, '', path)
@@ -13,68 +19,7 @@ function Notifications({ setPath, reportId }) {
   }
 
   const viewReport = (ticketId) => navigate(`/staff/notifications/${ticketId}`)
-
-  if (reportId) {
-    return (
-      <StaffLayout setPath={setPath} activePath="notifications">
-        <div className="staff-report-detail-enter">
-          <div className="staff-report-detail-actions">
-            <button className="staff-report-back" type="button" onClick={() => navigate('/staff/notifications')}>
-              <span aria-hidden="true">←</span> All reports
-            </button>
-            <button className="staff-report-new-issue" type="button" onClick={() => navigate('/staff/scan')}>
-              <StaffIcon name="scan" /> Report an issue
-            </button>
-          </div>
-          {selectedReport ? (
-            <div className="staff-view-heading staff-report-detail-heading">
-              <div>
-                <span className="staff-eyebrow">MAINTENANCE REPORT</span>
-                <h1>Report details</h1>
-                <p>{selectedReport.id} · Reported {selectedReport.date}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="staff-report-not-found">
-              <span className="staff-empty-icon"><StaffIcon name="bell" /></span>
-              <h1>Report not found</h1>
-              <p>This sample report may no longer be available.</p>
-              <button type="button" onClick={() => navigate('/staff/notifications')}>Back to notifications</button>
-            </div>
-          )}
-          {selectedReport && (
-            <>
-              <section className={`staff-report-detail-card staff-report-detail-status-${selectedReport.status.toLowerCase()}`}>
-                <div className="staff-report-card-top">
-                  <span className="staff-report-id">{selectedReport.id}</span>
-                  <span className={`staff-report-status-badge ${selectedReport.status.toLowerCase()}`}>
-                    {selectedReport.status === 'Unassigned' ? 'Needs assignment' : selectedReport.status}
-                  </span>
-                </div>
-                <h2>{selectedReport.asset}</h2>
-                <p>{selectedReport.issue} · {selectedReport.assetId}</p>
-                <div className="staff-report-detail-description">
-                  <span>Reported details</span>
-                  <p>{selectedReport.description || 'No description supplied.'}</p>
-                </div>
-              </section>
-
-              <section className="staff-report-detail-card staff-report-status-card">
-                <span className="staff-eyebrow">CURRENT STATUS</span>
-                <h2>{selectedReport.status === 'Unassigned' ? 'Needs assignment' : selectedReport.status}</h2>
-                <div className="staff-report-detail-fields">
-                  <div><span>Severity</span><strong>{selectedReport.severity}</strong></div>
-                  <div><span>Reported by</span><strong>{selectedReport.reporter}</strong></div>
-                  <div><span>Assigned technician</span><strong>{selectedReport.technician}</strong></div>
-                  <div><span>Report date</span><strong>{selectedReport.date}</strong></div>
-                </div>
-              </section>
-            </>
-          )}
-        </div>
-      </StaffLayout>
-    )
-  }
+  const openRepairDetails = (ticketId) => navigate(`/staff/repair/${ticketId}`)
 
   return (
     <StaffLayout setPath={setPath} activePath="notifications">
@@ -94,7 +39,12 @@ function Notifications({ setPath, reportId }) {
         {needsAction.length ? (
           <div className="staff-report-list">
             {needsAction.map((ticket) => (
-              <StaffReportCard key={ticket.id} ticket={ticket} needsAction onView={viewReport} />
+              <StaffReportCard
+                key={ticket.id}
+                ticket={ticket}
+                needsAction
+                onView={viewReport}
+              />
             ))}
           </div>
         ) : (
@@ -113,7 +63,11 @@ function Notifications({ setPath, reportId }) {
         </div>
         <div className="staff-report-list">
           {recentReports.map((ticket) => (
-            <StaffReportCard key={ticket.id} ticket={ticket} onView={viewReport} />
+            <StaffReportCard
+              key={ticket.id}
+              ticket={ticket}
+              onView={viewReport}
+            />
           ))}
         </div>
       </section>
@@ -122,6 +76,83 @@ function Notifications({ setPath, reportId }) {
         <StaffIcon name="scan" />
         Report an equipment issue
       </button>
+      {reportId && createPortal(
+        <div className="staff-report-view-modal-scrim" onMouseDown={(event) => { if (event.target === event.currentTarget) navigate('/staff/notifications') }}>
+          <section className="staff-report-view-modal" role="dialog" aria-modal="true" aria-labelledby="staff-report-view-modal-title">
+            <button type="button" className="staff-repair-modal-close" aria-label="Close report details" onClick={() => navigate('/staff/notifications')}>×</button>
+            {selectedReport ? (
+              <>
+                <span className="staff-eyebrow">MAINTENANCE REPORT</span>
+                <h2 id="staff-report-view-modal-title">Report details</h2>
+                <p className="staff-report-view-modal-reference">{selectedReport.id} · Reported {selectedReport.date}</p>
+
+                <section className={`staff-report-detail-card staff-report-detail-status-${selectedReport.status.toLowerCase()}`}>
+                  <div className="staff-report-card-top">
+                    <span className="staff-report-id">{selectedReport.id}</span>
+                    <span className={`staff-report-status-badge ${selectedReport.status.toLowerCase()}`}>
+                      {selectedReport.status === 'Unassigned' ? 'Needs assignment' : selectedReport.status}
+                    </span>
+                  </div>
+                  <h3>{selectedReport.asset}</h3>
+                  <p>{selectedReport.issue} · {selectedReport.assetId}</p>
+                  <div className="staff-report-detail-description">
+                    <span>Reported details</span>
+                    <p>{selectedReport.description || 'No description supplied.'}</p>
+                  </div>
+                </section>
+
+                <section className="staff-report-detail-card staff-report-status-card">
+                  <span className="staff-eyebrow">CURRENT STATUS</span>
+                  <h3>{selectedReport.status === 'Unassigned' ? 'Needs assignment' : selectedReport.status}</h3>
+                  <div className="staff-report-detail-fields">
+                    <div><span>Severity</span><strong>{selectedReport.severity}</strong></div>
+                    <div><span>Reported by</span><strong>{selectedReport.reporter}</strong></div>
+                    <div><span>Assigned technician</span><strong>{selectedReport.technician}</strong></div>
+                    <div><span>Report date</span><strong>{selectedReport.date}</strong></div>
+                    {selectedEquipment && <div><span>Asset availability</span><strong>{selectedEquipment.status}</strong></div>}
+                  </div>
+                </section>
+
+                <div className="staff-report-view-modal-actions">
+                  {selectedEquipment ? (
+                    <EquipmentUpdateButton
+                      asset={selectedEquipment}
+                      className="staff-task-update-button"
+                      label="Update asset"
+                      onUpdated={() => setEquipmentList(getStaffEquipment())}
+                      relatedTasks={tickets.filter((ticket) => ticket.assetId === selectedReport.assetId)}
+                      onOpenRepair={openRepairDetails}
+                    />
+                  ) : (
+                    <button type="button" className="staff-task-update-button" disabled title="This task's asset is not registered in Inventory.">
+                      Update asset
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="staff-repair-details-button"
+                    disabled={selectedReport.status === 'Unassigned'}
+                    title={selectedReport.status === 'Unassigned' ? 'Assign this task before entering repair details.' : undefined}
+                    onClick={() => openRepairDetails(selectedReport.id)}
+                  >
+                    {selectedReport.status === 'Unassigned'
+                      ? 'Repair not assigned'
+                      : ['Completed', 'Unserviceable'].includes(selectedReport.status) ? 'View repair details' : 'Staff Repair Details'}
+                    {selectedReport.status !== 'Unassigned' && <span aria-hidden="true">→</span>}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="staff-report-not-found">
+                <span className="staff-empty-icon"><StaffIcon name="bell" /></span>
+                <h2 id="staff-report-view-modal-title">Report not found</h2>
+                <p>This maintenance report may no longer be available.</p>
+              </div>
+            )}
+          </section>
+        </div>,
+        document.body
+      )}
     </StaffLayout>
   )
 }

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import AdminLayout from './adminLayout.jsx'
-import { initialTickets } from './adminData.jsx'
+import { getStaffTickets, saveStaffTickets } from '../staff/staffMaintenance.js'
 
 function Maintenance({ setPath }) {
-  const [tickets, setTickets] = useState(initialTickets)
+  const [tickets, setTickets] = useState(getStaffTickets)
   const [tab, setTab] = useState('Incoming')
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState(null)
@@ -17,14 +17,25 @@ function Maintenance({ setPath }) {
     return matchesTab && `${ticket.id} ${ticket.asset} ${ticket.assetId} ${ticket.issue}`.toLowerCase().includes(search.toLowerCase())
   }), [tickets, tab, search])
 
-  const updateTicket = (updates) => {
-    setTickets((current) => current.map((ticket) => ticket.id === selectedId ? { ...ticket, ...updates } : ticket))
+  const updateAnyTicket = (ticketId, updates) => {
+    const savedUpdates = {
+      ...updates,
+      updatedAt: new Date().toISOString(),
+      ...(['Completed', 'Unserviceable'].includes(updates.status) ? { repairDate: new Date().toLocaleDateString() } : {}),
+    }
+    const updated = tickets.map((ticket) => ticket.id === ticketId ? { ...ticket, ...savedUpdates } : ticket)
+    saveStaffTickets(updated)
+    setTickets(updated)
   }
+
+  const updateTicket = (updates) => updateAnyTicket(selectedId, updates)
 
   const submitIssue = (event) => {
     event.preventDefault()
     const ticket = { id: `TASK-${String(tickets.length + 1).padStart(3, '0')}`, assetId: draft.asset.split(' - ')[0], asset: draft.asset.split(' - ')[1] || draft.asset, issue: draft.issue, severity: draft.severity, status: 'Unassigned', reporter: 'Administrator', technician: 'Unassigned', description: draft.description, date: new Date().toLocaleDateString() }
-    setTickets((current) => [ticket, ...current])
+    const updated = [ticket, ...tickets]
+    saveStaffTickets(updated)
+    setTickets(updated)
     setDraft({ asset: '', issue: 'Hardware Failure', severity: 'Medium', description: '' })
     setSaved(true)
     setTab('Incoming')

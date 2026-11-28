@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { initialEquipment } from '../admin/adminData.jsx'
 import StaffLayout, { StaffIcon } from './StaffLayout.jsx'
+import EquipmentUpdateButton from './EquipmentUpdateButton.jsx'
+import { getStaffEquipment, getStaffTickets } from './staffMaintenance.js'
 
 const statusFilters = [
   { value: 'All', label: 'All equipment' },
@@ -15,6 +16,20 @@ const locationOrder = [
   'Computer Laboratory 3',
   'BSIT Department / Faculty',
   'Media Room',
+]
+
+const logExportColumns = [
+  ['Asset ID', (asset) => asset.id],
+  ['Equipment', (asset) => asset.name],
+  ['Category', (asset) => asset.category],
+  ['Location', (asset) => asset.location],
+  ['Condition', (asset) => asset.condition],
+  ['Status', (asset) => asset.status],
+  ['Recorded date', (asset) => asset.date],
+  ['Model', (asset) => asset.model],
+  ['Serial number', (asset) => asset.serial],
+  ['Cost', (asset) => asset.cost],
+  ['Warranty', (asset) => asset.warranty],
 ]
 
 function categoryLabel(category) {
@@ -33,7 +48,97 @@ function statusLabel(status) {
   return status === 'Available' ? 'Usable' : status
 }
 
+function compareEquipment(first, second, sortMode) {
+  if (sortMode === 'name') {
+    return first.name.localeCompare(second.name) || first.id.localeCompare(second.id)
+  }
+  if (sortMode === 'status') {
+    return first.status.localeCompare(second.status)
+      || first.name.localeCompare(second.name)
+      || first.id.localeCompare(second.id)
+  }
+
+  const dateDifference = Date.parse(second.date) - Date.parse(first.date)
+  return Number.isNaN(dateDifference) || dateDifference === 0
+    ? first.name.localeCompare(second.name) || first.id.localeCompare(second.id)
+    : dateDifference
+}
+
+function downloadEquipmentLogs() {
+  const equipmentList = getStaffEquipment()
+  const escapeCsv = (value) => {
+    const text = value == null ? '' : String(value)
+    const safeText = /^[\s]*[=+@-]/.test(text) ? `'${text}` : text
+    return `"${safeText.replaceAll('"', '""')}"`
+  }
+  const rows = [
+    logExportColumns.map(([heading]) => escapeCsv(heading)).join(','),
+    ...equipmentList.map((asset) => logExportColumns.map(([, getValue]) => escapeCsv(getValue(asset))).join(',')),
+  ]
+  const blob = new Blob([`\uFEFF${rows.join('\r\n')}`], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'CEMS_All_Equipment_Logs.csv'
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+function printEquipmentLogs() {
+  const equipmentList = getStaffEquipment()
+  const printWindow = window.open('', '_blank')
+  if (!printWindow) {
+    window.alert('Allow pop-ups for this site to open the PDF-ready equipment report.')
+    return
+  }
+
+  const escapeHtml = (value) => String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+  const headers = logExportColumns.map(([heading]) => `<th>${escapeHtml(heading)}</th>`).join('')
+  const rows = equipmentList.map((asset) => (
+    `<tr>${logExportColumns.map(([, getValue]) => `<td>${escapeHtml(getValue(asset))}</td>`).join('')}</tr>`
+  )).join('')
+
+  printWindow.document.open()
+  printWindow.document.write(`<!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <title>CEMS All Equipment Logs</title>
+        <style>
+          @page { size: A4 landscape; margin: 12mm; }
+          body { color: #26364d; font: 10px Arial, sans-serif; }
+          h1 { margin: 0 0 5px; font-size: 19px; }
+          p { margin: 0 0 15px; color: #64748b; font-size: 10px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #dfe5ec; padding: 6px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+          th { background: #f1f5f9; color: #26364d; }
+          tr { break-inside: avoid; }
+          @media screen { body { margin: 24px; } }
+        </style>
+      </head>
+      <body>
+        <h1>CEMS All Equipment Logs</h1>
+        <p>${equipmentList.length} equipment records · Generated ${escapeHtml(new Date().toLocaleDateString())}</p>
+        <table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>
+      </body>
+    </html>`)
+  printWindow.document.close()
+  printWindow.document.title = 'CEMS_All_Equipment_Logs'
+  printWindow.setTimeout(() => {
+    printWindow.focus()
+    printWindow.print()
+  }, 250)
+}
+
 function Inventory({ setPath }) {
+  const staffTickets = getStaffTickets()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [selectedCategory, setSelectedCategory] = useState('All')
@@ -42,16 +147,17 @@ function Inventory({ setPath }) {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [expandedLocations, setExpandedLocations] = useState({ 'Computer Laboratory 1': true })
   const [expandedAsset, setExpandedAsset] = useState(null)
+  const [equipmentList, setEquipmentList] = useState(getStaffEquipment)
 
-  const availableCount = initialEquipment.filter((asset) => asset.status === 'Available').length
-  const maintenanceCount = initialEquipment.filter((asset) => asset.status === 'Under Maintenance').length
-  const outOfServiceCount = initialEquipment.filter((asset) => asset.status === 'Out of Service').length
-  const categories = [...new Set(initialEquipment.map((asset) => asset.category))]
-  const locations = [...new Set(initialEquipment.map((asset) => asset.location))]
+  const availableCount = equipmentList.filter((asset) => asset.status === 'Available').length
+  const maintenanceCount = equipmentList.filter((asset) => asset.status === 'Under Maintenance').length
+  const outOfServiceCount = equipmentList.filter((asset) => asset.status === 'Out of Service').length
+  const categories = [...new Set(equipmentList.map((asset) => asset.category))]
+  const locations = [...new Set(equipmentList.map((asset) => asset.location))]
 
   const filteredEquipment = useMemo(() => {
     const query = search.trim().toLowerCase()
-    const matching = initialEquipment.filter((asset) => {
+    const matching = equipmentList.filter((asset) => {
       const matchesSearch = !query || [
         asset.name,
         asset.id,
@@ -66,12 +172,8 @@ function Inventory({ setPath }) {
       return matchesSearch && matchesStatus && matchesCategory && matchesLocation
     })
 
-    return matching.sort((first, second) => {
-      if (sortMode === 'name') return first.name.localeCompare(second.name)
-      if (sortMode === 'status') return first.status.localeCompare(second.status) || first.name.localeCompare(second.name)
-      return Date.parse(second.date) - Date.parse(first.date)
-    })
-  }, [search, statusFilter, selectedCategory, selectedLocation, sortMode])
+    return matching.sort((first, second) => compareEquipment(first, second, sortMode))
+  }, [equipmentList, search, statusFilter, selectedCategory, selectedLocation, sortMode])
 
   const equipmentGroups = useMemo(() => {
     const groups = filteredEquipment.reduce((result, asset) => {
@@ -80,13 +182,18 @@ function Inventory({ setPath }) {
       return result
     }, {})
 
-    return Object.entries(groups).sort(([first], [second]) => {
+    return Object.entries(groups).sort(([firstLocation, firstItems], [secondLocation, secondItems]) => {
+      const equipmentOrder = compareEquipment(firstItems[0], secondItems[0], sortMode)
+      if (equipmentOrder !== 0) return equipmentOrder
+
+      const first = firstLocation
+      const second = secondLocation
       const firstOrder = locationOrder.indexOf(first)
       const secondOrder = locationOrder.indexOf(second)
       return (firstOrder < 0 ? locationOrder.length : firstOrder) - (secondOrder < 0 ? locationOrder.length : secondOrder)
         || first.localeCompare(second)
     })
-  }, [filteredEquipment])
+  }, [filteredEquipment, sortMode])
 
   const hasActiveFilters = Boolean(search.trim())
     || statusFilter !== 'All'
@@ -105,6 +212,16 @@ function Inventory({ setPath }) {
   const navigateToScan = () => {
     window.history.pushState({}, '', '/staff/scan')
     setPath('/staff/scan')
+  }
+
+  const openItemLog = (assetId) => {
+    window.history.pushState({}, '', `/staff/inventory/${assetId}`)
+    setPath(`/staff/inventory/${assetId}`)
+  }
+
+  const openRepairDetails = (ticketId) => {
+    window.history.pushState({}, '', `/staff/repair/${ticketId}`)
+    setPath(`/staff/repair/${ticketId}`)
   }
 
   const toggleLocation = (location, autoExpanded) => {
@@ -172,7 +289,7 @@ function Inventory({ setPath }) {
         <div className="staff-inventory-stats" role="group" aria-label="Filter by equipment status">
           {statusFilters.map((filter) => {
             const count = filter.value === 'All'
-              ? initialEquipment.length
+              ? equipmentList.length
               : filter.value === 'Available'
                 ? availableCount
                 : filter.value === 'Under Maintenance'
@@ -198,7 +315,7 @@ function Inventory({ setPath }) {
         <div className="staff-inventory-toolbar">
           <p>
             Showing <strong>{filteredEquipment.length}</strong>
-            {hasActiveFilters && <> of {initialEquipment.length}</>} items
+            {hasActiveFilters && <> of {equipmentList.length}</>} items
           </p>
           <label className="staff-inventory-sort">
             <span>Sort:</span>
@@ -213,10 +330,28 @@ function Inventory({ setPath }) {
           </button>
         </div>
 
+        <div className="staff-inventory-export-actions" aria-label="Export all equipment logs">
+          <span>{equipmentList.length} equipment records</span>
+          <div>
+            <button type="button" className="staff-inventory-export-button" onClick={downloadEquipmentLogs}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3h16v-3" />
+              </svg>
+              CSV
+            </button>
+            <button type="button" className="staff-inventory-export-button pdf" onClick={printEquipmentLogs}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M7 3h7l5 5v13H7zM14 3v5h5M9 14h8M9 17h8" />
+              </svg>
+              Save as PDF
+            </button>
+          </div>
+        </div>
+
         {equipmentGroups.length ? (
           <div className="staff-inventory-groups">
             {equipmentGroups.map(([location, items]) => {
-              const allAtLocation = initialEquipment.filter((asset) => asset.location === location)
+              const allAtLocation = equipmentList.filter((asset) => asset.location === location)
               const categoryCounts = allAtLocation.reduce((result, asset) => {
                 result[asset.category] = (result[asset.category] || 0) + 1
                 return result
@@ -274,39 +409,53 @@ function Inventory({ setPath }) {
 
                           return (
                             <article className="staff-inventory-equipment" key={asset.id}>
-                              <button
-                                type="button"
-                                className="staff-inventory-equipment-button"
-                                aria-expanded={assetExpanded}
-                                onClick={() => setExpandedAsset((current) => current === asset.id ? null : asset.id)}
-                              >
-                                <span className="staff-inventory-equipment-icon">
-                                  <StaffIcon name={asset.category === 'Computer Equipment' ? 'computer' : 'inventory'} />
-                                </span>
-                                <span className="staff-inventory-equipment-copy">
-                                  <strong>{asset.name}</strong>
-                                  <small>{asset.id}</small>
-                                  <span className="staff-inventory-equipment-meta">
-                                    <span className={`staff-inventory-status status-${statusClass}`}>
-                                      <i aria-hidden="true" />
-                                      {statusLabel(asset.status)}
-                                    </span>
-                                    <span className="staff-inventory-added">
-                                      <StaffIcon name="calendar" />
-                                      Added {asset.date.split(' ').slice(0, 3).join(' ')}
+                              <div className="staff-inventory-equipment-row">
+                                <button
+                                  type="button"
+                                  className="staff-inventory-equipment-button"
+                                  aria-expanded={assetExpanded}
+                                  onClick={() => setExpandedAsset((current) => current === asset.id ? null : asset.id)}
+                                >
+                                  <span className="staff-inventory-equipment-icon">
+                                    <StaffIcon name={asset.category === 'Computer Equipment' ? 'computer' : 'inventory'} />
+                                  </span>
+                                  <span className="staff-inventory-equipment-copy">
+                                    <strong>{asset.name}</strong>
+                                    <small>{asset.id}</small>
+                                    <span className="staff-inventory-equipment-meta">
+                                      <span className={`staff-inventory-status status-${statusClass}`}>
+                                        <i aria-hidden="true" />
+                                        {statusLabel(asset.status)}
+                                      </span>
+                                      <span className="staff-inventory-added">
+                                        <StaffIcon name="calendar" />
+                                        Added {asset.date.split(' ').slice(0, 3).join(' ')}
+                                      </span>
                                     </span>
                                   </span>
-                                </span>
-                                <span className="staff-inventory-equipment-arrow" aria-hidden="true">›</span>
-                              </button>
+                                  <span className="staff-inventory-equipment-arrow" aria-hidden="true">›</span>
+                                </button>
+                                <EquipmentUpdateButton
+                                  asset={asset}
+                                  className="staff-inventory-update-button"
+                                  onUpdated={() => setEquipmentList(getStaffEquipment())}
+                                  relatedTasks={staffTickets.filter((ticket) => ticket.assetId === asset.id)}
+                                  onOpenRepair={openRepairDetails}
+                                />
+                              </div>
                               {assetExpanded && (
-                                <dl className="staff-inventory-equipment-details">
-                                  <div><dt>Category</dt><dd>{asset.category}</dd></div>
-                                  <div><dt>Location</dt><dd>{asset.location}</dd></div>
-                                  <div><dt>Model</dt><dd>{asset.model || 'Not recorded'}</dd></div>
-                                  <div><dt>Serial number</dt><dd>{asset.serial || 'Not recorded'}</dd></div>
-                                  <div><dt>Condition</dt><dd>{asset.condition || 'Not recorded'}</dd></div>
-                                </dl>
+                                <>
+                                  <dl className="staff-inventory-equipment-details">
+                                    <div><dt>Category</dt><dd>{asset.category}</dd></div>
+                                    <div><dt>Location</dt><dd>{asset.location}</dd></div>
+                                    <div><dt>Model</dt><dd>{asset.model || 'Not recorded'}</dd></div>
+                                    <div><dt>Serial number</dt><dd>{asset.serial || 'Not recorded'}</dd></div>
+                                    <div><dt>Condition</dt><dd>{asset.condition || 'Not recorded'}</dd></div>
+                                  </dl>
+                                  <button type="button" className="staff-item-log-open" onClick={() => openItemLog(asset.id)}>
+                                    Open item log <span aria-hidden="true">→</span>
+                                  </button>
+                                </>
                               )}
                             </article>
                           )
