@@ -7,7 +7,7 @@ namespace cems_api.Models
 {
     public class MaintenanceLog
     {
-        public string MaintenanceLogId { get; set; } = string.Empty;
+        public int MaintenanceLogId { get; set; }
         public int RequestId { get; set; }
         public int TechnicianId { get; set; }
         public string ActionPerformed { get; set; } = string.Empty;

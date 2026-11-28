@@ -10,7 +10,7 @@ namespace cems_api.Models
         public int NotificationId { get; set; }
         public int? RecipientUserId { get; set; }
         public int? EquipmentId { get; set; }
-        public string? RequestId { get; set; }
+        public int? RequestId { get; set; }
         public string NotificationType { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;

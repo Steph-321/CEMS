@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using cems_api.Models;
 
 namespace cems_api.Models
 {
@@ -16,5 +17,8 @@ namespace cems_api.Models
         public string AccountStatus { get; set; } = string.Empty;
         public DateTime? LastLogin { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        // Navigation
+        public Role? Role { get; set; }
     }
 }
